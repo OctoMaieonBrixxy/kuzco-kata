@@ -15,6 +15,12 @@ export type Chambre = Readonly<{
     numero: number;
 }>
 
+export type DemandeDeReservation = Readonly<{
+    dateDebut: Date;
+    dateFin: Date;
+    nombreDePersonne: number;
+}>
+
 export class HotelManager {
     private chambres: Chambre[] = [
         {
@@ -71,9 +77,22 @@ export class HotelManager {
             description: '1 queen size bed - A/C - private bathroom',
             capacite: 2,
         },
-        { etage: 3,	numero: 302,	description: '2 single beds - A/C - private bathroom', capacite:	2 },
-        { etage: 3,	numero: 303,	description: '3 single beds - A/C - shared bathroom', capacite:	3 },
-        { etage: 3,	numero: 304,	description: '2 single beds - shared bathroom', capacite:	2 }
+        { 
+            etage: 3,	
+            numero: 302,	
+            description: '2 single beds - A/C - private bathroom', 
+            capacite:	2 
+        },
+        { 
+            etage: 3,	
+            numero: 303,	
+            description: '3 single beds - A/C - shared bathroom', 
+            capacite:	3 },
+        { 
+            etage: 3,	
+            numero: 304,	
+            description: '2 single beds - shared bathroom', 
+            capacite:	2 }
     ];
 
     getRooms(): Chambre[] {
@@ -95,11 +114,23 @@ export class HotelManager {
 
         this.logger(print);
     }
+
+    getAvailableRooms(demandeDeReservation : DemandeDeReservation) {
+        const availableRooms: Chambre[] = [];
+
+        this.chambres.forEach(chambre => {
+            if (demandeDeReservation.nombreDePersonne <= chambre.capacite ) {
+                availableRooms.push(chambre)
+            }
+        });
+
+        return availableRooms;
+    }
+
 }
 
 describe('Hotel Manager', () => {
     it('affiche les chambres et leurs descriptifs', () => {
-        // given
         const listeDeChambresAttendues = [
             {
                 etage: 1,
@@ -159,6 +190,7 @@ describe('Hotel Manager', () => {
             { etage: 3,	numero: 303,	description: '3 single beds - A/C - shared bathroom', capacite:	3 },
             { etage: 3,	numero: 304,	description: '2 single beds - shared bathroom', capacite:	2 }
         ];
+        // given
         const hotelManager = new HotelManager(() => null);
         // when
         const tableauDesChambres = hotelManager.getRooms();
@@ -190,6 +222,40 @@ describe('Hotel Manager', () => {
         // @ts-ignore
         expect(afficher.getCall(0)).to.have.been.calledWith(messageAttendu)
 
+    })
+    it('permet de voir les chambres disponnibles pour 3 personnes ou plus',() => {
+        //given
+        const listeDeChambresAttendues = [
+            {
+                etage: 1,
+                numero: 103,
+                description: '3 single beds - A/C - Wi-Fi - private bathroom - wheelchair accessible',
+                capacite: 3
+            },
+            {   etage: 3,	
+                numero: 303,	
+                description: '3 single beds - A/C - shared bathroom', 
+                capacite:	3 
+            },
+            {
+                etage: 2,
+                numero: 203,
+                description: '1 king size bed + 3 single beds - A/C - Wi-Fi - private bathroom',
+                capacite: 5
+            },
+        ];
+        const hotelManager = new HotelManager(() => null);
+        const demandeDeReservation:DemandeDeReservation = {
+            dateDebut: new Date('2020-02-02'),
+            dateFin: new Date('2020-02-09'),
+            nombreDePersonne: 3,
+        }
+
+        //when 
+        const chambresDisponnible = hotelManager.getAvailableRooms(demandeDeReservation)
+
+        //then 
+        expect(chambresDisponnible).to.deep.include.members(listeDeChambresAttendues)
     })
 })
 
