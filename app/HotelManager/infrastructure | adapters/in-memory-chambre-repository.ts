@@ -1,5 +1,5 @@
-import { Chambre } from "../domain/models/chambres"
-import { ChambreRepository } from "../domain/interfaces/chambre-repository"
+import { Chambre } from "../domain | hexagone | core/models/chambres"
+import { ChambreRepository } from "../domain | hexagone | core/interfaces | contrats | ports/chambre-repository"
 
 export class InMemoryChambreRepository implements ChambreRepository {
         private chambres: Chambre[] = [
@@ -72,10 +72,11 @@ export class InMemoryChambreRepository implements ChambreRepository {
                 etage: 3,
                 numero: 304,
                 description: '2 single beds - shared bathroom',
-                capacite:	2 }
+                capacite:	2
+            }
         ];
 
         getChambres(){
-            return this.chambres
+            return this.chambres;
         }
 }

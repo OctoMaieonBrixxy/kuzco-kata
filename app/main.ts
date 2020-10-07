@@ -1,4 +1,8 @@
-import { HotelManager } from "./HotelManager/hotelmanager"
-import { InMemoryChambreRepository } from "./HotelManager/infrastructure/in-memory-chambre-repository"
+import { HotelManager } from "./hotelmanager"
+import { InMemoryChambreRepository } from "./HotelManager/infrastructure | adapters/in-memory-chambre-repository"
+
+
 const chambreRepository = new InMemoryChambreRepository()
-new HotelManager((value: any) => console.log(value), chambreRepository).afficherToutesLesChambres()
+const hotelManager = new HotelManager((value: any) => console.log(value), chambreRepository)
+
+hotelManager.afficherToutesLesChambres()

@@ -1,28 +1,102 @@
 // @ts-ignore
-import chai, { expect } from 'chai';
+import chai, {expect} from 'chai';
 import sinonChai from 'sinon-chai';
 import dirtyChai from 'dirty-chai';
 
 import sinon from 'sinon';
+import {HotelManager} from "./app/hotelmanager";
+import {ListeChambreEtDescriptifsUsecase} from "./app/HotelManager/usecases | hexagone | core/list-chambre-et-descriptif";
+import {ListeDesChambresDisponibleUsecase} from "./app/HotelManager/usecases | hexagone | core/liste-chambres-disponible";
+import {ChambreRepository} from "./app/HotelManager/domain | hexagone | core/interfaces | contrats | ports/chambre-repository";
+import {Chambre} from "./app/HotelManager/domain | hexagone | core/models/chambres";
+import {DemandeDeReservation} from "./app/HotelManager/domain | hexagone | core/models/demande-de-reservation";
 
 chai.use(sinonChai)
 chai.use(dirtyChai);
 
-export type Chambre = Readonly<{
-    description: string;
-    etage: number;
-    capacite: number;
-    numero: number;
-}>
-
-export type DemandeDeReservation = Readonly<{
-    dateDebut: Date;
-    dateFin: Date;
-    nombreDePersonne: number;
-}>
-
-
 describe('Hotel Manager', () => {
+    let chambreRepository: ChambreRepository;
+
+    beforeEach(() => {
+        chambreRepository = {
+            getChambres(): Chambre[] {
+                return [
+                    {
+                        etage: 1,
+                        numero: 101,
+                        description: '1 king size bed - A/C - Wi-Fi - private bathroom - wheelchair accessible',
+                        capacite: 2
+                    },
+                    {
+                        etage: 1,
+                        numero: 102,
+                        description: '1 king size bed - A/C - Wi-Fi - private bathroom - wheelchair accessible',
+                        capacite: 2
+                    },
+                    {
+                        etage: 1,
+                        numero: 103,
+                        description: '3 single beds - A/C - Wi-Fi - private bathroom - wheelchair accessible',
+                        capacite: 3
+                    },
+                    {
+                        etage: 2,
+                        numero: 201,
+                        description: '1 king size bed - A/C - Wi-Fi - private bathroom',
+                        capacite: 2
+                    },
+                    {
+                        etage: 2,
+                        numero: 202,
+                        description: '1 queen size bed - Wi-Fi - private bathroom',
+                        capacite: 2
+                    },
+                    {
+                        etage: 2,
+                        numero: 203,
+                        description: '1 king size bed + 3 single beds - A/C - Wi-Fi - private bathroom',
+                        capacite: 5
+                    },
+                    {
+                        etage: 2,
+                        numero: 204,
+                        description: '1 single bed - Wi-Fi - shared bathroom',
+                        capacite: 1,
+                    },
+                    {
+                        etage: 2,
+                        numero: 205,
+                        description: '2 single beds - A/C - Wi-Fi - shared bathroom',
+                        capacite: 2,
+                    },
+                    {
+                        etage: 3,
+                        numero: 301,
+                        description: '1 queen size bed - A/C - private bathroom',
+                        capacite: 2,
+                    },
+                    {
+                        etage: 3,
+                        numero: 302,
+                        description: '2 single beds - A/C - private bathroom',
+                        capacite:	2
+                    },
+                    {
+                        etage: 3,
+                        numero: 303,
+                        description: '3 single beds - A/C - shared bathroom',
+                        capacite:	3 },
+                    {
+                        etage: 3,
+                        numero: 304,
+                        description: '2 single beds - shared bathroom',
+                        capacite:	2
+                    }
+                ]
+            }
+        }
+    })
+
     it('affiche les chambres et leurs descriptifs', () => {
         const listeDeChambresAttendues = [
             {
@@ -84,9 +158,10 @@ describe('Hotel Manager', () => {
             { etage: 3,	numero: 304,	description: '2 single beds - shared bathroom', capacite:	2 }
         ];
         // given
-        const hotelManager = new HotelManager(() => null);
+        const listChambresEtDescriptifs = new ListeChambreEtDescriptifsUsecase(chambreRepository);
         // when
-        const tableauDesChambres = hotelManager.getRooms();
+
+        const tableauDesChambres = listChambresEtDescriptifs.handle();
 
         // then
         expect(tableauDesChambres).to.deep.equal(listeDeChambresAttendues)
@@ -108,9 +183,9 @@ describe('Hotel Manager', () => {
             '|  3  :::: 303 :::: 3 single beds - A/C - shared bathroom :::: 3 |\n' +
             '|  3  :::: 304 :::: 2 single beds - shared bathroom :::: 2 |\n' +
             '|______________________________________________________________|';
-        const hotelManager = new HotelManager(afficher);
+        const hotelManager = new HotelManager(afficher, chambreRepository);
 
-        hotelManager.printRooms()
+        hotelManager.afficherToutesLesChambres()
 
         // @ts-ignore
         expect(afficher.getCall(0)).to.have.been.calledWith(messageAttendu)
@@ -125,10 +200,10 @@ describe('Hotel Manager', () => {
                 description: '3 single beds - A/C - Wi-Fi - private bathroom - wheelchair accessible',
                 capacite: 3
             },
-            {   etage: 3,	
-                numero: 303,	
-                description: '3 single beds - A/C - shared bathroom', 
-                capacite:	3 
+            {   etage: 3,
+                numero: 303,
+                description: '3 single beds - A/C - shared bathroom',
+                capacite:	3
             },
             {
                 etage: 2,
@@ -137,18 +212,18 @@ describe('Hotel Manager', () => {
                 capacite: 5
             },
         ];
-        const hotelManager = new HotelManager(() => null);
+        const listeDesChambresDisponibleUsecase = new ListeDesChambresDisponibleUsecase(chambreRepository);
         const demandeDeReservation:DemandeDeReservation = {
             dateDebut: new Date('2020-02-02'),
             dateFin: new Date('2020-02-09'),
             nombreDePersonne: 3,
         }
 
-        //when 
-        const chambresDisponnible = hotelManager.getAvailableRooms(demandeDeReservation)
+        //when
+        const chambreDisponiblePourTroisPersonnes = listeDesChambresDisponibleUsecase.handle(demandeDeReservation)
 
-        //then 
-        expect(chambresDisponnible).to.deep.include.members(listeDeChambresAttendues)
+        //then
+        expect(chambreDisponiblePourTroisPersonnes).to.deep.include.members(listeDeChambresAttendues)
     })
 })
 
