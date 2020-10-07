@@ -2,3 +2,5 @@ require:
   - 'ts-node/register'
 extension:
   - 'ts'
+spec:
+  - 'app/**/*.test.ts'
