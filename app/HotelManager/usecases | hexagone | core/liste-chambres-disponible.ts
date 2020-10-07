@@ -1,5 +1,5 @@
 import {ChambreRepository} from "../domain | hexagone | core/interfaces | contrats | ports/chambre-repository";
-import {DemandeDeReservation} from "../../../main.test";
+import {DemandeDeReservation} from "./__tests__/hotel-manager.test";
 
 export class ListeDesChambresDisponibleUsecase {
     constructor(private chambreRepository: ChambreRepository) {

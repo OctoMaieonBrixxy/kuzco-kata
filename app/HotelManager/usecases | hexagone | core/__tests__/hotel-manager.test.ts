@@ -4,12 +4,12 @@ import sinonChai from 'sinon-chai';
 import dirtyChai from 'dirty-chai';
 
 import sinon from 'sinon';
-import {HotelManager} from "./app/hotelmanager";
-import {ListeChambreEtDescriptifsUsecase} from "./app/HotelManager/usecases | hexagone | core/list-chambre-et-descriptif";
-import {ListeDesChambresDisponibleUsecase} from "./app/HotelManager/usecases | hexagone | core/liste-chambres-disponible";
-import {ChambreRepository} from "./app/HotelManager/domain | hexagone | core/interfaces | contrats | ports/chambre-repository";
-import {Chambre} from "./app/HotelManager/domain | hexagone | core/models/chambres";
-import {DemandeDeReservation} from "./app/HotelManager/domain | hexagone | core/models/demande-de-reservation";
+import {HotelManager} from "../../../hotelmanager";
+import {ListeChambreEtDescriptifsUsecase} from "../list-chambre-et-descriptif";
+import {ListeDesChambresDisponibleUsecase} from "../liste-chambres-disponible";
+import {ChambreRepository} from "../../domain | hexagone | core/interfaces | contrats | ports/chambre-repository";
+import {Chambre} from "../../domain | hexagone | core/models/chambres";
+import {DemandeDeReservation} from "../../domain | hexagone | core/models/demande-de-reservation";
 
 chai.use(sinonChai)
 chai.use(dirtyChai);
