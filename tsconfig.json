@@ -21,6 +21,7 @@
     "strictPropertyInitialization": false
   },
   "include": [
+    "app",
     "src",
     "scripts",
     "package.json"
